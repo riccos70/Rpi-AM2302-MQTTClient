@@ -1,0 +1,10 @@
+####################################################################################
+STEP PER IL CABLAGGIO SU  RASPBERRYPI3
+-------------------------------
+- Abilitare il supporto per OneWire sul pinio di default (4)
+- Aggiungere dtoverlay=w1-gpio nel file /boot/config.txt e riavviare il dispositivo
+- Collegare pin1 (primo a sinistra) con alimentazione 3.3V o meglio 5V 
+- Collegare pin2 (secondo da sinistra) con GPIO4
+- Collegare pin4 (primo da destra) al Ground
+- Collegare resistenza di 10K tra Alimentazione e GPIO4
+####################################################################################
