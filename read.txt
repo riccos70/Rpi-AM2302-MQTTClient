@@ -1,0 +1,17 @@
+# Thermometer-AM2302
+## Python code to build a thermometer on Raspberry Using  AM2302 sensor 
+### Script description
+These python scripts are used to:
+- retrieve temperature value from AM2302 sensor
+- retrieve data and time from raspberry
+- write datetime and temperature in mysql database (Sensor-AM2302-Mysql.py)
+- write datetime and temperature in MQTT Queue message system (Sensor-AM2302-MQTT.py) NOT READY YET
+### Hardware description
+Read file Assemblaggio-Sensore.txt
+### Installation
+- Clone this repo
+- Create a virtual env ( python3 -m venv venv)
+- Activate this venv ( source  venv/bin/activate)
+- Install requirements (pip install -r requirements_Sensor-AM2302-Mysql.txt)   
+- Run **Sensor-AM2302-Mysql.py** script into screen from the right virtual env
+- In case something is going wrong for mysqlclient you need to install:**sudo apt-get install python3-dev** and re-run again previous step

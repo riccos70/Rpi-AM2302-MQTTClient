@@ -1,6 +1,6 @@
-# AM2302 with display and MQTT on PICO W device
+# AM2302 sending data into MQTT broker on Rpi device
 
-import ujson
+import json
 import dht 
 import network
 import time
@@ -9,20 +9,20 @@ from machine import Pin, I2C
 from umqtt.simple import MQTTClient
 
 with open('config.json', 'r') as f:
-    config = ujson.load(f)
+    config = json.load(f)
 
 # Fill in your WiFi network name (ssid) and password here:
-wifi_ssid = config['WIFI']['SSID']
-wifi_password = config['WIFI']['PASSWORD']
+#wifi_ssid = config['WIFI']['SSID']
+#wifi_password = config['WIFI']['PASSWORD']
 
 # Connect to WiFi
-wlan = network.WLAN(network.STA_IF)
-wlan.active(True)
-wlan.connect(wifi_ssid, wifi_password)
-while wlan.isconnected() == False:
-    print('Waiting for connection...')
-    time.sleep(1)
-print("Connected to WiFi")
+#wlan = network.WLAN(network.STA_IF)
+#wlan.active(True)
+#wlan.connect(wifi_ssid, wifi_password)
+#while wlan.isconnected() == False:
+#    print('Waiting for connection...')
+#    time.sleep(1)
+#print("Connected to WiFi")
 
 # Fill in your MQTT Broker details
 mqtt_host = config['MQTT']['HOST']
@@ -44,10 +44,10 @@ mqtt_client.connect()
 
 dSensor = dht.DHT22(Pin(2))
 
-WIDTH =128 
-HEIGHT= 64
-i2c=I2C(0,scl=Pin(1),sda=Pin(0),freq=200000)
-oled = SSD1306_I2C(WIDTH,HEIGHT,i2c)
+#WIDTH =128 
+#HEIGHT= 64
+#i2c=I2C(0,scl=Pin(1),sda=Pin(0),freq=200000)
+#oled = SSD1306_I2C(WIDTH,HEIGHT,i2c)
 
 def readDHT():
     try:
@@ -61,15 +61,15 @@ def readDHT():
     except OSError as e:
         print('Failed to read data from DHT sensor')
 
-def printDhtData(t,h):
-    oled.fill(0)
-    oled.text("Temp:", 0, 10)
-    oled.text(str(t), 80, 10)
-    oled.text("C", 120, 10)
-    oled.text("Humidity:", 0, 30)
-    oled.text(str(h), 80, 30)
-    oled.text("%", 120, 30)
-    oled.show()
+#def printDhtData(t,h):
+#    oled.fill(0)
+#    oled.text("Temp:", 0, 10)
+#    oled.text(str(t), 80, 10)
+#    oled.text("C", 120, 10)
+#    oled.text("Humidity:", 0, 30)
+#    oled.text(str(h), 80, 30)
+#    oled.text("%", 120, 30)
+#    oled.show()
     
 def publishData(t,h):
     try:
@@ -85,8 +85,8 @@ def publishData(t,h):
 while True:
     # Read the data from sensor
     temp, hum= readDHT()
-    # Display the data on OLED
-    printDhtData(temp, hum)
+#    # Display the data on OLED
+#    printDhtData(temp, hum)
     # Publish the data to the topic
     publishData(temp, hum)
     time.sleep(3)
