@@ -50,8 +50,8 @@ def publishData(t,h):
     try:
         client.publish(mqtt_publish_temp_topic, str(t))
         client.publish(mqtt_publish_hum_topic, str(h))
-#        print(f'Publish {t:.1f}')
-#        print(f'Publish {h:.1f}')
+        print(f'Publish {t:.1f}')
+        print(f'Publish {h:.1f}')
     except Exception as e:
         print(f'Failed to publish message: {e}')
 
