@@ -1,0 +1,5 @@
+# created by riccos
+logs/**
+venv/**
+__pycache__/**
+config/**
