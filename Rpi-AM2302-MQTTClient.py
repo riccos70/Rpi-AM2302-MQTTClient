@@ -60,4 +60,4 @@ while True:
     temp, hum= readDHT()
     # Publish the data to the topic
     publishData(temp, hum)
-    time.sleep(3)
+    time.sleep(60)
