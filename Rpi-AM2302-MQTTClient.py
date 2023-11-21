@@ -1,8 +1,9 @@
 # AM2302 sending data into MQTT broker on Rpi device
 
+import random
+import time
 import json
 import Adafruit_DHT
-import time
 from paho.mqtt import client as mqtt_client
 
 with open('config.json', 'r') as f:
@@ -13,11 +14,15 @@ mqtt_host = config['MQTT']['HOST']
 mqtt_username = config['MQTT']['USERNAME']
 mqtt_port = config['MQTT']['PORT']
 mqtt_password = config['MQTT']['PASSWORD']
-mqtt_publish_temp_topic = "casagrotti/sala/temperatura/sens01"  # The MQTT topic
-mqtt_publish_hum_topic = "casagrotti/sala/umidita/sens01"  # The MQTT topic
-mqtt_client_id = "Rpi3-001"
+mqtt_publish_topic_01 = "casagrotti/sala/temperatura/sens01"  # The MQTT topic
+mqtt_publish_topic_02 = "casagrotti/sala/umidita/sens01"  # The MQTT topic
+# Generate a Client ID with the publish prefix.
+mqtt_client_id = f'publish-{random.randint(0, 1000)}'
 
-# Initialize our MQTTClient and connect to the MQTT server
+# Fill in DHT sensor details
+DHT_SENSOR = Adafruit_DHT.DHT22
+DHT_PIN = config['DHT']['PIN_NUMBER']
+
 def connect_mqtt():
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
@@ -31,12 +36,6 @@ def connect_mqtt():
     client.connect(mqtt_host, mqtt_port)
     return client
 
-client = connect_mqtt()
-
-# Fill in DHT sensor details
-DHT_SENSOR = Adafruit_DHT.DHT22
-DHT_PIN = config['DHT']['PIN_NUMBER']
-
 def readDHT():
     try:        
         hum, temp = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
@@ -45,19 +44,30 @@ def readDHT():
         return temp, hum
     except OSError as e:
         print('Failed to read data from DHT sensor')
-    
-def publishData(t,h):
-    try:
-        client.publish(mqtt_publish_temp_topic, str(t))
-        client.publish(mqtt_publish_hum_topic, str(h))
-        print(f'Publish {t:.1f}')
-        print(f'Publish {h:.1f}')
-    except Exception as e:
-        print(f'Failed to publish message: {e}')
 
-while True:
-    # Read the data from sensor
-    temp, hum= readDHT()
-    # Publish the data to the topic
-    publishData(temp, hum)
-    time.sleep(60)
+def publish(client):
+    while True:
+        time.sleep(30)
+        t,u = readDHT() 
+        result1 = client.publish(mqtt_publish_topic_01, t)
+        result2 = client.publish(mqtt_publish_topic_02, u)
+        # result: [0, 1]
+        status1 = result1[0]
+        if status1 == 0:
+            print(f"Send `{t}` to topic `{mqtt_publish_topic_01}`")
+        else:
+            print(f"Failed to send message to topic {mqtt_publish_topic_01}")
+        status2 = result2[0]
+        if status2 == 0:
+            print(f"Send `{u}` to topic `{mqtt_publish_topic_02}`")
+        else:
+            print(f"Failed to send message to topic {mqtt_publish_topic_02}")
+
+
+def run():
+    client = connect_mqtt()
+    publish(client)
+
+
+if __name__ == '__main__':
+    run()
