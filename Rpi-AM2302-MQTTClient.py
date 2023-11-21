@@ -38,9 +38,11 @@ def connect_mqtt():
 
 def readDHT():
     try:        
-        hum, temp = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
+        h, t = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
 #        print(f'Temperature= {temp:.1f} C')
 #        print(f'Humidity= {hum:.1f} %')
+        temp = round(t,1)
+        hum = round(h,1) 
         return temp, hum
     except OSError as e:
         print('Failed to read data from DHT sensor')
