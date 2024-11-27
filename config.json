@@ -1,11 +1,20 @@
 {
+    "WIFI": {
+        "SSID": "iliadbox-A0EA8D",
+        "PASSWORD": "C4s4C0st4nz1"
+    },
     "MQTT": {
         "HOST": "riccos.mooo.com",
         "USERNAME": "pi",
-        "PASSWORD": "C0st4nz1",
-        "PORT": 1883
+        "PASSWORD": "C0st4nz1"
     },
-    "DHT": {
-        "PIN_NUMBER": 4
+    "TOPIC": {
+        "TYPE": "sensori",
+        "AREA": "terni",
+        "ZONE": "sala"
+    },
+    "DATA": {
+        "MEAS01": "temperatura",
+        "MEAS02": "umidita"
     }
 }    
