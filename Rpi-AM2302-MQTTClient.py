@@ -1,57 +1,75 @@
-# AM2302 with display and MQTT on PICO W device
+# AM2302 sending data into MQTT broker on Rpi device
 
-import ujson
-import dht 
-import network
-import time
 import random
-import machine
-from machine import Pin
-from umqtt.simple import MQTTClient
+import time
+import json
+import Adafruit_DHT
+from paho.mqtt import client as mqtt_client
 
 with open('config.json', 'r') as f:
-    config = ujson.load(f)
+    config = json.load(f)
 
-# Fill in your MQTT Broker details
+# Fill in MQTT Broker details
 mqtt_host = config['MQTT']['HOST']
-mqtt_username = config['MQTT']['USERNAME']  
+mqtt_username = config['MQTT']['USERNAME']
+mqtt_port = config['MQTT']['PORT']
 mqtt_password = config['MQTT']['PASSWORD']
-ttype = config['TOPIC']['TYPE']
-tarea = config['TOPIC']['AREA']
-tzone = config['TOPIC']['ZONE']
-mqtt_publish_topic = ttype+"/"+tarea+"/"+tzone
+mqtt_publish_topic_01 = "casagrotti/sala/temperatura/sens01"  # The MQTT topic
+mqtt_publish_topic_02 = "casagrotti/sala/umidita/sens01"  # The MQTT topic
+# Generate a Client ID with the publish prefix.
 mqtt_client_id = f'publish-{random.randint(0, 1000)}'
 
-# Fill in sensor details
-dSensor = dht.DHT22(Pin(2))
-mis01 = config['DATA']['MEAS01']
-mis02 = config['DATA']['MEAS02']
+# Fill in DHT sensor details
+DHT_SENSOR = Adafruit_DHT.DHT22
+DHT_PIN = config['DHT']['PIN_NUMBER']
 
-def reset():
-    print("Resetting...")
-    time.sleep(5)
-    machine.reset()
+def connect_mqtt():
+    def on_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print("Connected to MQTT Broker!")
+        else:
+            print("Failed to connect, return code %d\n", rc)
 
-def main():
-    print(f"Begin connection with MQTT Broker :: {mqtt_host}")
-    mqttClient = MQTTClient(client_id=mqtt_client_id, server=mqtt_host, user=mqtt_username, password=mqtt_password, keepalive=60)
-    mqttClient.connect()
+    client = mqtt_client.Client(mqtt_client_id)
+    client.username_pw_set(mqtt_username, mqtt_password)
+    client.on_connect = on_connect
+    client.connect(mqtt_host, mqtt_port)
+    return client
+
+def readDHT():
+    try:        
+        h, t = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN)
+#        print(f'Temperature= {temp:.1f} C')
+#        print(f'Humidity= {hum:.1f} %')
+        temp = round(t,1)
+        hum = round(h,1) 
+        return temp, hum
+    except OSError as e:
+        print('Failed to read data from DHT sensor')
+
+def publish(client):
     while True:
-        # Read the data from sensor
-        dSensor.measure()
-        temp = dSensor.temperature()
-        hum = dSensor.humidity()
-        msg = "{\"area\": \""+tarea+"\", \"zone\": \""+tzone+"\", \""+mis01+"\": " + str(temp) + ", \""+mis02+"\": " + str(hum) + "}"
-        print(msg)
-        # Publish the data to the topics
-        mqttClient.publish(mqtt_publish_topic, msg)
-        # Wait for interval time
         time.sleep(30)
+        t,u = readDHT() 
+        result1 = client.publish(mqtt_publish_topic_01, t)
+        result2 = client.publish(mqtt_publish_topic_02, u)
+        # result: [0, 1]
+        status1 = result1[0]
+        if status1 == 0:
+            print(f"Send `{t}` to topic `{mqtt_publish_topic_01}`")
+        else:
+            print(f"Failed to send message to topic {mqtt_publish_topic_01}")
+        status2 = result2[0]
+        if status2 == 0:
+            print(f"Send `{u}` to topic `{mqtt_publish_topic_02}`")
+        else:
+            print(f"Failed to send message to topic {mqtt_publish_topic_02}")
 
-if __name__ == "__main__":
-    while True:
-        try:
-            main()
-        except OSError as e:
-            print("Error: " + str(e))
-            reset()
+
+def run():
+    client = connect_mqtt()
+    publish(client)
+
+
+if __name__ == '__main__':
+    run()
