@@ -56,7 +56,7 @@ def readDHT():
 
 def publish(client):
     while True:
-        time.sleep(10)
+        time.sleep(30)
         t,u = readDHT()
         msg = "{\"area\": \""+tarea+"\", \"zone\": \""+tzone+"\", \""+mis01+"\": " + str(t) + ", \""+mis02+"\": " + str(u) + "}"
         result = client.publish(mqtt_publish_topic, msg)
