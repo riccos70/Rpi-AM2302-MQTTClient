@@ -2,7 +2,7 @@
 Sensore per temperatura e umidità implementato in un raspberry PI/zero che spedisce i dati verso un broker MQTT
 
 ### Installation
-- Clone this repo
+- Clone this repo using --recurse-submodules option
 - Create a virtual env ( python3 -m venv venv)
 - Activate this venv ( source  venv/bin/activate)
 - Install requirements (pip install -r requirements_Sensor-AM2302-Mysql.txt)   
