@@ -1,0 +1,3 @@
+[submodule "libs/shared_lib"]
+	path = libs/shared_lib
+	url = git@github.com:riccos70/shared_lib.git
