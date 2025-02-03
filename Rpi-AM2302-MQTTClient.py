@@ -68,6 +68,7 @@ def publish(client):
         time.sleep(30)
         # t,u = readDHT()
         t1,u1 = readDHT(sensor1)
+        time.sleep(5)
         t2,u2 = readDHT(sensor2)
     #   msg = "{\"area\": \""+tarea+"\", \"zone\": \""+tzone+"\", \""+mis01+"\": " + str(t) + ", \""+mis02+"\": " + str(u) + "}"
         msg1 = "{\"area\": \""+tarea+"\", \"zone\": \""+tzone1+"\", \""+mis01+"\": " + str(t1) + ", \""+mis02+"\": " + str(u1) + "}"
